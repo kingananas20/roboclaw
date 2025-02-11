@@ -1,3 +1,4 @@
+#[derive(Debug, Clone, Copy)]
 pub enum Commands {
     M1Forward = 0,
     M1Backward = 1,
