@@ -21,8 +21,6 @@ pub enum ConnectionError {
 
 pub struct Connection {
     port: Box<dyn SerialPort>,
-    baud_rate: u32,
-    timeout: Duration,
     retries: u8,
     crc: Crc16
 }
@@ -35,8 +33,6 @@ impl Connection {
 
         Ok(Self {
             port,
-            baud_rate,
-            timeout,
             retries,
             crc: Crc16::new(),
         })
