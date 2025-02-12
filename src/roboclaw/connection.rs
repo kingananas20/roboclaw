@@ -49,7 +49,6 @@ impl Connection {
     }
 
     fn send_command(&mut self, address: u8, command: Commands) -> Result<(), ConnectionError> {
-        self.crc.clear();
         self.crc.update(address);
         self.port.write_all(&[address])?;
         self.crc.update(command as u8);
@@ -64,7 +63,6 @@ impl Connection {
     pub fn write(&mut self, address: u8, command: Commands, values: &[u32]) -> Result<(), ConnectionError> {
         for _ in 0..self.retries {
             self.reset_connection()?;
-            
             self.send_command(address, command)?;
             
             for &val in values {
@@ -120,4 +118,46 @@ impl Connection {
     //----------------------------------------------------------------------------------------------------------------------------------------------//
     //----------------------------------------------------------------[Read Methods]----------------------------------------------------------------//
     //----------------------------------------------------------------------------------------------------------------------------------------------//
+
+    pub fn read(&mut self, address: u8, command: Commands, num_reads: usize, byte_size: usize) -> Result<Vec<u32>, ConnectionError> {
+        for _ in 0..self.retries {
+            self.reset_connection()?;
+            self.send_command(address, command)?;
+
+            let mut data: Vec<_> = Vec::new();
+            for _ in 0..num_reads {
+                let bytes: Vec<u8> = self.read_bytes(byte_size)?;
+                let value: u32 = match byte_size {
+                    1 => bytes[0] as u32,
+                    2 => u16::from_be_bytes([bytes[0], bytes[1]]) as u32,
+                    4 => u32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]),
+                    _ => return Err(ConnectionError::InvalidValue(byte_size as u32)),
+                };
+                data.push(value);
+            }
+
+            if self.read_checksum()? {
+                return Ok(data);
+            }
+        }
+
+        Err(ConnectionError::Timeout(self.retries))
+    }
+
+    fn read_checksum(&mut self) -> Result<bool, ConnectionError> {
+        let crc: Vec<u8> = self.read_bytes(2)?;
+        if self.crc.get() & 0xFFFF == u16::from_be_bytes([crc[0], crc[1]]) {
+            return Ok(true);
+        }
+        Err(ConnectionError::CrcMismatch)
+    }
+
+    fn read_bytes(&mut self, byte_size: usize) -> Result<Vec<u8>, ConnectionError>{
+        let mut buf: Vec<u8> = vec![0u8; byte_size];
+        self.port.read(&mut buf)?;
+        for b in &buf {
+            self.crc.update(*b);
+        }
+        Ok(buf)
+    }   
 }
