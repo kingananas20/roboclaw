@@ -1,4 +1,12 @@
 mod roboclaw;
+use pyo3::prelude::*;
+use roboclaw::RoboClaw;
+
+#[pymodule]
+fn roboclaw_python(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<RoboClaw>()?;
+    Ok(())
+} 
 
 #[cfg(test)]
 mod tests {

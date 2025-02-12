@@ -1,10 +1,10 @@
 use serialport::{SerialPort, ClearBuffer};
-use std::time::Duration;
+use std::{time::Duration, sync::{Arc, Mutex}};
 use anyhow::{anyhow, Context, Result};
 use super::{commands::Commands, Crc16};
 
 pub struct Connection {
-    port: Box<dyn SerialPort>,
+    port: Arc<Mutex<Box<dyn SerialPort>>>,
     retries: u8,
     crc: Crc16
 }
@@ -17,23 +17,23 @@ impl Connection {
             .with_context(|| format!("error while while creating a new serialport using following values:\nport_name: {}\nbaud_rate: {}\ntimout: {:?}\nretries: {}", port_name, baud_rate, timeout, retries))?;
 
         Ok(Self {
-            port,
+            port: Arc::new(Mutex::new(port)),
             retries,
             crc: Crc16::new(),
         })
     }
 
     fn reset_connection(&mut self) -> Result<()> {
-        self.port.clear(ClearBuffer::Input)?;
+        self.port.lock().unwrap().clear(ClearBuffer::Input)?;
         self.crc.clear();
         Ok(())
     }
 
     fn send_command(&mut self, address: u8, command: Commands) -> Result<()> {
         self.crc.update(address);
-        self.port.write_all(&[address])?;
+        self.port.lock().unwrap().write_all(&[address])?;
         self.crc.update(command as u8);
-        self.port.write_all(&[command as u8])?;
+        self.port.lock().unwrap().write_all(&[command as u8])?;
         Ok(())
     }
 
@@ -64,30 +64,30 @@ impl Connection {
 
     fn write_u8(&mut self, byte: u8) -> Result<()> {
         self.crc.update(byte);
-        self.port.write_all(&[byte])?;
+        self.port.lock().unwrap().write_all(&[byte])?;
         Ok(())
     }
 
     fn write_u16(&mut self, value: u16) -> Result<()> {
         let bytes: [u8; 2] = value.to_be_bytes();
         self.crc.update_bytes(&bytes);
-        self.port.write_all(&bytes)?;
+        self.port.lock().unwrap().write_all(&bytes)?;
         Ok(())
     }
 
     fn write_u32(&mut self, value: u32) -> Result<()> {
         let bytes: [u8; 4] = value.to_be_bytes();
         self.crc.update_bytes(&bytes);
-        self.port.write_all(&bytes)?;
+        self.port.lock().unwrap().write_all(&bytes)?;
         Ok(())
     }
 
     fn verify_write_checksum(&mut self) -> Result<bool> {
         let crc_bytes: [u8; 2] = self.crc.get().to_be_bytes();
-        self.port.write_all(&crc_bytes)?;
+        self.port.lock().unwrap().write_all(&crc_bytes)?;
 
         let mut ack: [u8; 1] = [0u8; 1];
-        match self.port.read_exact(&mut ack) {
+        match self.port.lock().unwrap().read_exact(&mut ack) {
             Ok(_) => Ok(ack[0] == 0xFF),
             Err(e) if e.kind() == std::io::ErrorKind::TimedOut => Ok(false),
             Err(e) => Err(e.into()),
@@ -133,7 +133,7 @@ impl Connection {
 
     fn read_bytes(&mut self, byte_size: usize) -> Result<Vec<u8>>{
         let mut buf: Vec<u8> = vec![0u8; byte_size];
-        self.port.read_exact(&mut buf)?;
+        self.port.lock().unwrap().read_exact(&mut buf)?;
         for b in &buf {
             self.crc.update(*b);
         }
