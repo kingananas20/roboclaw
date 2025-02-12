@@ -13,8 +13,8 @@ pub enum ConnectionError {
     Timeout(u8),
     #[error("CRC mismatch")]
     CrcMismatch,
-    #[error("Invalid ACK received")]
-    InvalidAck,
+    #[error("Invalid ACK received: {0}")]
+    InvalidAck(String),
     #[error("Invalid value: {0}")]
     InvalidValue(u32),
 }
@@ -113,7 +113,7 @@ impl Connection {
         match self.port.read_exact(&mut ack) {
             Ok(_) => Ok(ack[0] == 0xFF),
             Err(e) if e.kind() == std::io::ErrorKind::TimedOut => Ok(false),
-            Err(e) => Err(e.into()),
+            Err(e) => Err(ConnectionError::InvalidAck(e.to_string())),
         }
     }
 
