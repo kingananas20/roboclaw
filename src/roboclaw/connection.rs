@@ -13,7 +13,8 @@ impl Connection {
     pub fn new(port_name: &str, baud_rate: u32, timeout: Duration, retries: u8) -> Result<Self> {
         let port: Box<dyn SerialPort> = serialport::new(port_name, baud_rate)
             .timeout(timeout)
-            .open()?;
+            .open()
+            .with_context(|| format!("error while while creating a new serialport using following values:\nport_name: {}\nbaud_rate: {}\ntimout: {:?}\nretries: {}", port_name, baud_rate, timeout, retries))?;
 
         Ok(Self {
             port,
