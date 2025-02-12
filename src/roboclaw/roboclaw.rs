@@ -1,5 +1,5 @@
 use std::time::Duration;
-use super::connection::{Connection, ConnectionError};
+use super::connection::Connection;
 
 pub struct RoboClaw {
     connection: Connection,

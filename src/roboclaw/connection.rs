@@ -1,23 +1,7 @@
 use serialport::{SerialPort, ClearBuffer};
 use std::time::Duration;
-use thiserror::Error;
+use anyhow::{anyhow, Context, Result};
 use super::{commands::Commands, Crc16};
-
-#[derive(Debug, Error)]
-pub enum ConnectionError {
-    #[error("Serial port error: {0}")]
-    Serial(#[from] serialport::Error),
-    #[error("IO error: {0}")]
-    Io(#[from] std::io::Error), 
-    #[error("Timeout after {0} retries")]
-    Timeout(u8),
-    #[error("CRC mismatch")]
-    CrcMismatch,
-    #[error("Invalid ACK received: {0}")]
-    InvalidAck(String),
-    #[error("Invalid value: {0}")]
-    InvalidValue(u32),
-}
 
 pub struct Connection {
     port: Box<dyn SerialPort>,
@@ -26,7 +10,7 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub fn new(port_name: &str, baud_rate: u32, timeout: Duration, retries: u8) -> Result<Self, ConnectionError> {
+    pub fn new(port_name: &str, baud_rate: u32, timeout: Duration, retries: u8) -> Result<Self> {
         let port: Box<dyn SerialPort> = serialport::new(port_name, baud_rate)
             .timeout(timeout)
             .open()?;
@@ -38,13 +22,13 @@ impl Connection {
         })
     }
 
-    fn reset_connection(&mut self) -> Result<(), ConnectionError> {
+    fn reset_connection(&mut self) -> Result<()> {
         self.port.clear(ClearBuffer::Input)?;
         self.crc.clear();
         Ok(())
     }
 
-    fn send_command(&mut self, address: u8, command: Commands) -> Result<(), ConnectionError> {
+    fn send_command(&mut self, address: u8, command: Commands) -> Result<()> {
         self.crc.update(address);
         self.port.write_all(&[address])?;
         self.crc.update(command as u8);
@@ -56,7 +40,7 @@ impl Connection {
     //----------------------------------------------------------------[Write Methods]----------------------------------------------------------------//
     //-----------------------------------------------------------------------------------------------------------------------------------------------//
 
-    pub fn write(&mut self, address: u8, command: Commands, values: &[u32]) -> Result<(), ConnectionError> {
+    pub fn write(&mut self, address: u8, command: Commands, values: &[u32]) -> Result<()> {
         for _ in 0..self.retries {
             self.reset_connection()?;
             self.send_command(address, command)?;
@@ -74,30 +58,30 @@ impl Connection {
             }
         }
 
-        Err(ConnectionError::Timeout(self.retries))
+        Err(anyhow!("timeout after {}", self.retries))
     }
 
-    fn write_u8(&mut self, byte: u8) -> Result<(), ConnectionError> {
+    fn write_u8(&mut self, byte: u8) -> Result<()> {
         self.crc.update(byte);
         self.port.write_all(&[byte])?;
         Ok(())
     }
 
-    fn write_u16(&mut self, value: u16) -> Result<(), ConnectionError> {
+    fn write_u16(&mut self, value: u16) -> Result<()> {
         let bytes: [u8; 2] = value.to_be_bytes();
         self.crc.update_bytes(&bytes);
         self.port.write_all(&bytes)?;
         Ok(())
     }
 
-    fn write_u32(&mut self, value: u32) -> Result<(), ConnectionError> {
+    fn write_u32(&mut self, value: u32) -> Result<()> {
         let bytes: [u8; 4] = value.to_be_bytes();
         self.crc.update_bytes(&bytes);
         self.port.write_all(&bytes)?;
         Ok(())
     }
 
-    fn verify_write_checksum(&mut self) -> Result<bool, ConnectionError> {
+    fn verify_write_checksum(&mut self) -> Result<bool> {
         let crc_bytes: [u8; 2] = self.crc.get().to_be_bytes();
         self.port.write_all(&crc_bytes)?;
 
@@ -105,7 +89,7 @@ impl Connection {
         match self.port.read_exact(&mut ack) {
             Ok(_) => Ok(ack[0] == 0xFF),
             Err(e) if e.kind() == std::io::ErrorKind::TimedOut => Ok(false),
-            Err(e) => Err(ConnectionError::Io(e)),
+            Err(e) => Err(e.into()),
         }
     }
 
@@ -113,7 +97,7 @@ impl Connection {
     //----------------------------------------------------------------[Read Methods]----------------------------------------------------------------//
     //----------------------------------------------------------------------------------------------------------------------------------------------//
 
-    pub fn read(&mut self, address: u8, command: Commands, num_reads: usize, byte_size: usize) -> Result<Vec<u32>, ConnectionError> {
+    pub fn read(&mut self, address: u8, command: Commands, num_reads: usize, byte_size: usize) -> Result<Vec<u32>> {
         for _ in 0..self.retries {
             self.reset_connection()?;
             self.send_command(address, command)?;
@@ -125,7 +109,7 @@ impl Connection {
                     1 => bytes[0] as u32,
                     2 => u16::from_be_bytes([bytes[0], bytes[1]]) as u32,
                     4 => u32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]),
-                    _ => return Err(ConnectionError::InvalidValue(byte_size as u32)),
+                    _ => return Err(anyhow!("invalid value: {} needs to be 1, 2 or 4", &byte_size)),
                 };
                 data.push(value);
             }
@@ -135,18 +119,18 @@ impl Connection {
             }
         }
 
-        Err(ConnectionError::Timeout(self.retries))
+        Err(anyhow!("timeout after {}", self.retries))
     }
 
-    fn read_checksum(&mut self) -> Result<bool, ConnectionError> {
+    fn read_checksum(&mut self) -> Result<bool> {
         let crc: Vec<u8> = self.read_bytes(2)?;
         if self.crc.get() & 0xFFFF == u16::from_be_bytes([crc[0], crc[1]]) {
             return Ok(true);
         }
-        Err(ConnectionError::CrcMismatch)
+        Err(anyhow!("crc mismatch during reading"))
     }
 
-    fn read_bytes(&mut self, byte_size: usize) -> Result<Vec<u8>, ConnectionError>{
+    fn read_bytes(&mut self, byte_size: usize) -> Result<Vec<u8>>{
         let mut buf: Vec<u8> = vec![0u8; byte_size];
         self.port.read_exact(&mut buf)?;
         for b in &buf {
