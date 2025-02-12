@@ -89,17 +89,15 @@ impl Connection {
 
     fn write_u16(&mut self, value: u16) -> Result<(), ConnectionError> {
         let bytes: [u8; 2] = value.to_be_bytes();
-        self.write_u8(bytes[0])?;
-        self.write_u8(bytes[1])?;
+        self.crc.update_bytes(&bytes);
+        self.port.write_all(&bytes)?;
         Ok(())
     }
 
     fn write_u32(&mut self, value: u32) -> Result<(), ConnectionError> {
         let bytes: [u8; 4] = value.to_be_bytes();
-        self.write_u8(bytes[0])?;
-        self.write_u8(bytes[1])?;
-        self.write_u8(bytes[2])?;
-        self.write_u8(bytes[3])?;
+        self.crc.update_bytes(&bytes);
+        self.port.write_all(&bytes)?;
         Ok(())
     }
 
@@ -111,7 +109,7 @@ impl Connection {
         match self.port.read_exact(&mut ack) {
             Ok(_) => Ok(ack[0] == 0xFF),
             Err(e) if e.kind() == std::io::ErrorKind::TimedOut => Ok(false),
-            Err(e) => Err(ConnectionError::InvalidAck(e.to_string())),
+            Err(e) => Err(ConnectionError::Io(e)),
         }
     }
 
@@ -154,7 +152,7 @@ impl Connection {
 
     fn read_bytes(&mut self, byte_size: usize) -> Result<Vec<u8>, ConnectionError>{
         let mut buf: Vec<u8> = vec![0u8; byte_size];
-        self.port.read(&mut buf)?;
+        self.port.read_exact(&mut buf)?;
         for b in &buf {
             self.crc.update(*b);
         }

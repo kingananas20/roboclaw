@@ -18,6 +18,12 @@ impl Crc16 {
         }
     }
 
+    pub fn update_bytes(&mut self, bytes: &[u8]) {
+        for byte in bytes {
+            self.update(*byte);
+        }
+    }
+
     pub fn clear(&mut self) {
         self.crc = 0;
     }
