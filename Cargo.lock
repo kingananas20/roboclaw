@@ -237,7 +237,7 @@ dependencies = [
 
 [[package]]
 name = "roboclaw_python"
-version = "0.1.8"
+version = "0.1.9"
 dependencies = [
  "anyhow",
  "pyo3",
