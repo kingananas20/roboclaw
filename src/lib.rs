@@ -1,10 +1,11 @@
 mod roboclaw;
 use pyo3::prelude::*;
-use roboclaw::RoboClaw;
+use roboclaw::{RoboClaw, Motor};
 
 #[pymodule]
 fn roboclaw_python(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<RoboClaw>()?;
+    m.add_class::<Motor>()?;
     Ok(())
 } 
 
