@@ -8,6 +8,8 @@ use anyhow::{Context, Result};
 pub struct RoboClaw {
     connection: Connection,
     address: u8,
+    encoder_value_m1: i64,
+    encoder_value_m2: i64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -15,6 +17,27 @@ pub struct RoboClaw {
 pub enum Motor {
     M1 = 1,
     M2 = 2,
+}
+
+fn calculate_encoder(mut current_encoder: i64, motor_encoder: Vec<u32>) -> i64 {
+    let max_count: i64 = 2_i64.pow(32);
+    let bits: [u8; 8] = Connection::get_bits(motor_encoder[1] as u8);
+
+    let encoder_value_signed: i64 = if motor_encoder[0] as i64 > (max_count / 2) {
+        (motor_encoder[0] as i64) - max_count
+    } else {
+        motor_encoder[0] as i64
+    };
+
+    if bits[0] == 1 {
+        current_encoder += max_count + encoder_value_signed;
+    } else if bits[2] == 1 {
+        current_encoder -= max_count - encoder_value_signed;
+    } else {
+        current_encoder = encoder_value_signed;
+    }
+
+    current_encoder
 }
 
 #[pymethods]
@@ -32,7 +55,9 @@ impl RoboClaw {
 
         Ok(Self {
             connection,
-            address
+            address,
+            encoder_value_m1: 0,
+            encoder_value_m2: 0,
         })
     }
 
@@ -88,5 +113,28 @@ impl RoboClaw {
         let address: u8 = address.unwrap_or(self.address);
         self.connection.write(address, command, &[speed.unsigned_abs() as u32])?;
         Ok(true)
+    }
+
+    #[pyo3(signature = (motor, address=None))]
+    fn read_encoder(&mut self, motor: Motor, address: Option<u8>) -> Result<i64> {
+        let command: Commands = match motor {
+            Motor::M1 => Commands::M1ReadEncoder,
+            Motor::M2 => Commands::M2ReadEncoder,
+        };
+        let address: u8 = address.unwrap_or(self.address);
+        let read_result: Vec<u32> = self.connection.read(address, command, vec![4, 1])?;
+
+        match motor {
+            Motor::M1 => {
+                let encoder_value = calculate_encoder(self.encoder_value_m1, read_result);
+                self.encoder_value_m1 = encoder_value;
+                return Ok(encoder_value);
+            },
+            Motor::M2 => {
+                let encoder_value = calculate_encoder(self.encoder_value_m2, read_result);
+                self.encoder_value_m2 = encoder_value;
+                return Ok(encoder_value);
+            },
+        }
     }
 }

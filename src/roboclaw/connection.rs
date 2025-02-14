@@ -1,4 +1,5 @@
 use serialport::{SerialPort, ClearBuffer};
+use core::num;
 use std::{time::Duration, sync::{Arc, Mutex}};
 use anyhow::{anyhow, Context, Result};
 use super::{commands::Commands, Crc16};
@@ -35,6 +36,14 @@ impl Connection {
         self.crc.update(command as u8);
         self.port.lock().unwrap().write_all(&[command as u8])?;
         Ok(())
+    }
+
+    pub fn get_bits(byte: u8) -> [u8; 8] {
+        let mut bits: [u8; 8] = [0; 8];
+        for i in 0..8 {
+            bits[7 - i] = (byte >> i) & 1;
+        }
+        bits
     }
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------//
@@ -98,19 +107,19 @@ impl Connection {
     //----------------------------------------------------------------[Read Methods]----------------------------------------------------------------//
     //----------------------------------------------------------------------------------------------------------------------------------------------//
 
-    pub fn read(&mut self, address: u8, command: Commands, num_reads: usize, byte_size: usize) -> Result<Vec<u32>> {
+    pub fn read(&mut self, address: u8, command: Commands, how: Vec<u8>) -> Result<Vec<u32>> {
         for _ in 0..self.retries {
             self.reset_connection()?;
             self.send_command(address, command)?;
 
             let mut data: Vec<_> = Vec::new();
-            for _ in 0..num_reads {
-                let bytes: Vec<u8> = self.read_bytes(byte_size)?;
+            for byte_size in &how {
+                let bytes: Vec<u8> = self.read_bytes(*byte_size)?;
                 let value: u32 = match byte_size {
                     1 => bytes[0] as u32,
                     2 => u16::from_be_bytes([bytes[0], bytes[1]]) as u32,
                     4 => u32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]),
-                    _ => return Err(anyhow!("invalid value: {} needs to be 1, 2 or 4", &byte_size)),
+                    _ => return Err(anyhow!("invalid value: {} needs to be 1, 2 or 4", byte_size)),
                 };
                 data.push(value);
             }
@@ -131,8 +140,8 @@ impl Connection {
         Err(anyhow!("crc mismatch during reading"))
     }
 
-    fn read_bytes(&mut self, byte_size: usize) -> Result<Vec<u8>>{
-        let mut buf: Vec<u8> = vec![0u8; byte_size];
+    fn read_bytes(&mut self, byte_size: u8) -> Result<Vec<u8>>{
+        let mut buf: Vec<u8> = vec![0u8; byte_size as usize];
         self.port.lock().unwrap().read_exact(&mut buf)?;
         for b in &buf {
             self.crc.update(*b);
