@@ -43,12 +43,6 @@ fn calculate_encoder(mut current_encoder: i64, motor_encoder: Vec<u32>) -> i64 {
 #[pymethods]
 impl RoboClaw {
     #[new]
-    /// Makes a new class with the provided values
-    /// 
-    /// ### Examples
-    /// ```
-    /// roboclaw = RoboClaw.new("dev/sstt", 115000, 20, 128)
-    /// ```
     fn new(port_name: &str, baud_rate: u32, timeout: u32, retries: u8, address: u8) -> Result<Self> {
         let connection: Connection = Connection::new(port_name, baud_rate, Duration::new(0, timeout * 1_000_000), retries)
             .context("couldn't make a new connection")?;
@@ -61,12 +55,6 @@ impl RoboClaw {
         })
     }
 
-    /// Sets the speed of a specified motor.
-    /// 
-    /// ### Detailed Description 
-    /// - motor: is either 1 or 2 
-    /// - speed: positive to make the motor turn into the positive direction and negative for the other way around
-    /// - address (optional): address of the roboclaw with the motor on (default to RoboClaw.new(address))
     #[pyo3(signature = (motor, speed, address=None))]
     fn set_speed(&mut self, motor: Motor, speed: i8, address: Option<u8>) -> Result<bool> {
         let command: Commands = match (motor, speed) {
@@ -81,11 +69,6 @@ impl RoboClaw {
         Ok(true)
     }
 
-    /// Drives both motors in the same direction
-    /// 
-    /// ### Detailed Description
-    /// - speed: negative to drive forward, positive to drive backwards
-    /// - address (optional): address of the roboclaw with the motors on (default to RoboClaw.new(address))
     #[pyo3(signature = (speed, address=None))]
     fn drive(&mut self, speed: i8, address: Option<u8>) -> Result<bool> {
         let command: Commands = match speed {
@@ -98,11 +81,6 @@ impl RoboClaw {
         Ok(true)
     }
 
-    /// Turn
-    /// 
-    /// ### Detailed Description
-    /// - speed: negative to turn left, positive to turn right
-    /// - address (optional): address of the roboclaw with the motors on (default to RoboClaw.new(address))
     #[pyo3(signature = (speed, address=None))]
     fn turn(&mut self, speed: i8, address: Option<u8>) -> Result<bool> {
         let command: Commands = match speed {

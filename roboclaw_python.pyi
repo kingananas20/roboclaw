@@ -4,7 +4,11 @@ class Motor:
     M1 = 1
     M2 = 2
 
-class RoboClaw:    
+class RoboClaw:  
+    """
+    Class to control the roboclaw
+    """
+
     def set_speed(self, motor: Motor, speed: int, address: int = None) -> bool: 
         """
         Sets the speed of a specified motor.

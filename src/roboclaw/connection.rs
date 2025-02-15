@@ -1,5 +1,4 @@
 use serialport::{SerialPort, ClearBuffer};
-use core::num;
 use std::{time::Duration, sync::{Arc, Mutex}};
 use anyhow::{anyhow, Context, Result};
 use super::{commands::Commands, Crc16};
