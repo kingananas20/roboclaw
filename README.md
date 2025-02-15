@@ -12,8 +12,9 @@ Features
 
 This library will only work on devices with the AArch64 architecture running linux/gnu.
 Here's a list of example devices:
--   Raspberry PI 4, 5
+-   Raspberry PI 3/4/5 (Requires a 64-bit OS)
 -   Raspberry PI Zero 2 W
+-   NVIDIA Jetson Series
 
 ## Installation
 
