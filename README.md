@@ -8,6 +8,13 @@ Features
     Turn Both Motors: Control turning by adjusting motor speeds in opposite directions.
     Read Encoder: Accurately read encoder values, adjusting for overflow and underflow.
 
+## System Requirements
+
+This library will only work on devices with the AArch64 architecture running linux/gnu.
+Here's a list of example devices:
+    -   Raspberry PI 4, 5
+    -   Raspberry PI Zero 2 W
+
 ## Installation
 
     pip install roboclaw-python

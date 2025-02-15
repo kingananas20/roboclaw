@@ -1,5 +1,6 @@
 use super::connection::Connection;
 use super::commands::Commands;
+use super::common::calculate_encoder;
 use std::time::Duration;
 use pyo3::prelude::*;
 use anyhow::{Context, Result};
@@ -17,27 +18,6 @@ pub struct RoboClaw {
 pub enum Motor {
     M1 = 1,
     M2 = 2,
-}
-
-fn calculate_encoder(mut current_encoder: i64, motor_encoder: Vec<u32>) -> i64 {
-    let max_count: i64 = 2_i64.pow(32);
-    let bits: [u8; 8] = Connection::get_bits(motor_encoder[1] as u8);
-
-    let encoder_value_signed: i64 = if motor_encoder[0] as i64 > (max_count / 2) {
-        (motor_encoder[0] as i64) - max_count
-    } else {
-        motor_encoder[0] as i64
-    };
-
-    if bits[0] == 1 {
-        current_encoder += max_count + encoder_value_signed;
-    } else if bits[2] == 1 {
-        current_encoder -= max_count - encoder_value_signed;
-    } else {
-        current_encoder = encoder_value_signed;
-    }
-
-    current_encoder
 }
 
 #[pymethods]
@@ -104,12 +84,12 @@ impl RoboClaw {
 
         match motor {
             Motor::M1 => {
-                let encoder_value = calculate_encoder(self.encoder_value_m1, read_result);
+                let encoder_value: i64 = calculate_encoder(self.encoder_value_m1, read_result);
                 self.encoder_value_m1 = encoder_value;
                 return Ok(encoder_value);
             },
             Motor::M2 => {
-                let encoder_value = calculate_encoder(self.encoder_value_m2, read_result);
+                let encoder_value: i64 = calculate_encoder(self.encoder_value_m2, read_result);
                 self.encoder_value_m2 = encoder_value;
                 return Ok(encoder_value);
             },

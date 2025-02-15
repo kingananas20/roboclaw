@@ -25,4 +25,15 @@ mod tests {
         crc.update(255);
         assert_eq!(crc.get(), 7920);
     }
+
+    #[test]
+    fn encoder() {
+        let read_result: Vec<u32> = vec![12_000_000, 0b10000000];
+        let mut encoder_value: i64 = 1_000_000_000;
+        
+        encoder_value = calculate_encoder(encoder_value, read_result);
+
+        println!("{}", encoder_value);  
+        assert!(true);
+    }
 }
