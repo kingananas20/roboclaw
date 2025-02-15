@@ -48,3 +48,8 @@ class RoboClaw:
         """
         Read the current serial timeout setting. Range is 0 to 255.
         """
+    def read_encoder_speed(self, address: int = None) -> int:
+        """
+        Read encoder counter speed. Returned value is in pulses per second.
+        RoboClaw keeps track of how many pulses received per second for both encoder channels.
+        """

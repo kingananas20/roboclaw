@@ -14,7 +14,7 @@ pub fn calculate_encoder(current_encoder_value: i64, motor_encoder: Vec<u32>) ->
     sum
 }
 
-fn get_bits(byte: u8) -> [u8; 8] {
+pub fn get_bits(byte: u8) -> [u8; 8] {
     let mut bits: [u8; 8] = [0; 8];
     for i in 0..8 {
         bits[7 - i] = (byte >> i) & 1;
