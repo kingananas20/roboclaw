@@ -1,1 +1,6 @@
 /target
+/Include
+/Lib
+/Scripts
+pyvenv.cfg
+/.vscode
