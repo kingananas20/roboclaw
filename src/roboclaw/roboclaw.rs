@@ -3,7 +3,7 @@ use super::commands::Commands;
 use super::common::calculate_encoder;
 use std::time::Duration;
 use pyo3::prelude::*;
-use anyhow::{Context, Result};
+use anyhow::{Context, Ok, Result};
 
 #[pyclass]
 pub struct RoboClaw {
@@ -94,5 +94,19 @@ impl RoboClaw {
                 return Ok(encoder_value);
             },
         }
+    }
+
+    #[pyo3(signature = (timeout, address=None))]
+    fn set_serial_timeout(&mut self, timeout: u8, address: Option<u8>) -> Result<bool> {
+        let address: u8 = address.unwrap_or(self.address);
+        self.connection.write(address, Commands::SetSerialTimeout, &[timeout as u32])?;
+        Ok(true)
+    }
+
+    #[pyo3(signature = (address=None))]
+    fn read_serial_timeout(&mut self, address: Option<u8>) -> Result<u8> {
+        let address: u8 = address.unwrap_or(self.address);
+        let result: Vec<u32> = self.connection.read(address, Commands::ReadSerialTimeout, vec![1])?;
+        Ok(result[0] as u8)
     }
 }
