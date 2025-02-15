@@ -15,7 +15,7 @@ Features
 ## Usage
 
 ### Example in Python using the PyO3 bindings
-    from roboclaw import RoboClaw, Motor
+    from roboclaw_python import RoboClaw, Motor
 
 ### Initialize RoboClaw
     roboclaw = RoboClaw(port_name="/dev/ttyUSB0", baud_rate=115200, timeout=20, retries=128, address=128)
