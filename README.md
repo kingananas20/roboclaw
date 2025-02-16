@@ -37,5 +37,9 @@ Here's a list of example devices:
     set_serial_timeout()        Sets the serial timeout
     read_serial_timeout()       Reads the serial timeout
 
+## External links
+-   [Basic Micro](https://www.basicmicro.com/)
+-   [Roboclaw User Manual](https://downloads.basicmicro.com/docs/roboclaw_user_manual.pdf)
+
 ## License
 This project is licensed under the MIT License.
