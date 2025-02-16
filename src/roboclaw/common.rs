@@ -4,8 +4,8 @@ pub fn calculate_encoder(current_encoder_value: i64, motor_encoder: Vec<u32>) ->
     let delta: i64 = motor_encoder[0] as i32 as i64;
     let mut sum: i64 = current_encoder_value + delta;
 
-    let underflow: bool = bits[-1] != 0;
-    let overflow: bool = bits[-3] != 0;
+    let underflow: bool = bits[bits.len() - 1] != 0;
+    let overflow: bool = bits[bits.len() - 3] != 0;
 
     let range: i64 = u32::MAX as i64 + 1;
     sum += overflow as i64 * range;
