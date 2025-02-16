@@ -43,3 +43,5 @@ Here's a list of example devices:
 
 ## License
 This project is licensed under the MIT License.
+
+This is an unofficial roboclaw driver for python. I'm not affiliated with Basic Micro.
