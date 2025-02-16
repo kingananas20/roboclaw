@@ -28,5 +28,14 @@ Here's a list of example devices:
     encoder_value_m1 = roboclaw.read_encoder(Motor.M1)
     print(f"Motor M1 Encoder: {encoder_value_m1}")
 
+## Currently supported
+    set_speed()                 M1 + M2 Forward and Backwards
+    drive()                     Both motors forwards and backwards at the same time
+    turn()                      Turn one or the other motor
+    read_encoder()              Reads the encoder of a specified motor
+    read_encoder_speed()        Read the speed of the encoder in counts per second
+    set_serial_timeout()        Sets the serial timeout
+    read_serial_timeout()       Reads the serial timeout
+
 ## License
 This project is licensed under the MIT License.
