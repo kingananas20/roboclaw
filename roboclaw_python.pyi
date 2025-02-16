@@ -34,10 +34,27 @@ class RoboClaw:
         - speed: negative to turn left, positive to turn right
         - address (optional): address of the roboclaw with the motors on (default to RoboClaw.new(address))
         """
+
+    #Encoder Commands
     def read_encoder(self, motor: Motor, address: int = None) -> int:
         """
         Reads and returns the encoder value of the specified motor
         """
+    def read_encoder_speed(self, address: int = None) -> int:
+        """
+        Read encoder counter speed. Returned value is in pulses per second.
+        RoboClaw keeps track of how many pulses received per second for both encoder channels.
+        """
+    def reset_encoders(self, address: int = None) -> bool:
+        """
+        Will reset both quadrature encoder counters to zero. This command applies to quadrature encoders only.
+        """
+    def set_encoder(self, motor: Motor, encoder_value: int, address: int = None) -> bool:
+        """
+        Set the value of the specified encoder register. Useful when homing. This command applies to quadrature encoders only.
+        """
+
+    #Advanced Commands
     def set_serial_timeout(self, timeout: int, address: int = None) -> bool:
         """
         Sets the serial communication timout in 100ms increments.
@@ -47,9 +64,4 @@ class RoboClaw:
     def read_serial_timeout(self, address: int = None) -> int:
         """
         Read the current serial timeout setting. Range is 0 to 255.
-        """
-    def read_encoder_speed(self, address: int = None) -> int:
-        """
-        Read encoder counter speed. Returned value is in pulses per second.
-        RoboClaw keeps track of how many pulses received per second for both encoder channels.
         """

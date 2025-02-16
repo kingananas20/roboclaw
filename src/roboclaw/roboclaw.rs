@@ -1,6 +1,6 @@
 use super::connection::Connection;
 use super::commands::Commands;
-use super::common::{calculate_encoder, get_bits};
+use super::common::calculate_encoder;
 use std::time::Duration;
 use pyo3::prelude::*;
 use anyhow::{Context, Ok, Result};
@@ -34,6 +34,8 @@ impl RoboClaw {
             encoder_value_m2: 0,
         })
     }
+
+    //--------------------------------[Simple Commands]--------------------------------//
 
     #[pyo3(signature = (motor, speed, address=None))]
     fn set_speed(&mut self, motor: Motor, speed: i8, address: Option<u8>) -> Result<bool> {
@@ -73,6 +75,8 @@ impl RoboClaw {
         Ok(true)
     }
 
+    //--------------------------------[Encoders]--------------------------------//
+
     #[pyo3(signature = (motor, address=None))]
     fn read_encoder(&mut self, motor: Motor, address: Option<u8>) -> Result<i64> {
         let command: Commands = match motor {
@@ -96,18 +100,22 @@ impl RoboClaw {
         }
     }
 
-    #[pyo3(signature = (timeout, address=None))]
-    fn set_serial_timeout(&mut self, timeout: u8, address: Option<u8>) -> Result<bool> {
-        let address: u8 = address.unwrap_or(self.address);
-        self.connection.write(address, Commands::SetSerialTimeout, &[timeout as u32])?;
-        Ok(true)
-    }
-
     #[pyo3(signature = (address=None))]
-    fn read_serial_timeout(&mut self, address: Option<u8>) -> Result<u8> {
+    fn reset_encoders(&mut self, address: Option<u8>) -> Result<bool> {
         let address: u8 = address.unwrap_or(self.address);
-        let result: Vec<u32> = self.connection.read(address, Commands::ReadSerialTimeout, vec![1])?;
-        Ok(result[0] as u8)
+        self.connection.write(address, Commands::ResetEncoders, &[])?;
+        Ok(true)
+    }   
+
+    #[pyo3(signature = (motor, encoder_value, address=None))]
+    fn set_encoder(&mut self, motor: Motor, encoder_value: i32, address: Option<u8>) -> Result<bool> {
+        let command: Commands = match motor {
+            Motor::M1 => Commands::M1SetEncoder,
+            Motor::M2 => Commands::M2SetEncoder,
+        };
+        let address: u8 = address.unwrap_or(self.address);
+        self.connection.write(address, command, &[encoder_value as u32])?;
+        Ok(true)
     }
 
     #[pyo3(signature = (motor, address=None))]
@@ -125,5 +133,21 @@ impl RoboClaw {
         }
 
         Ok(speed)
+    }
+
+    //--------------------------------[Advanced Commands]--------------------------------//
+
+    #[pyo3(signature = (timeout, address=None))]
+    fn set_serial_timeout(&mut self, timeout: u8, address: Option<u8>) -> Result<bool> {
+        let address: u8 = address.unwrap_or(self.address);
+        self.connection.write(address, Commands::SetSerialTimeout, &[timeout as u32])?;
+        Ok(true)
+    }
+
+    #[pyo3(signature = (address=None))]
+    fn read_serial_timeout(&mut self, address: Option<u8>) -> Result<u8> {
+        let address: u8 = address.unwrap_or(self.address);
+        let result: Vec<u32> = self.connection.read(address, Commands::ReadSerialTimeout, vec![1])?;
+        Ok(result[0] as u8)
     }
 }

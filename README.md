@@ -32,8 +32,14 @@ Here's a list of example devices:
     set_speed()                 M1 + M2 Forward and Backwards
     drive()                     Both motors forwards and backwards at the same time
     turn()                      Turn one or the other motor
+
+    //Encoders
     read_encoder()              Reads the encoder of a specified motor
     read_encoder_speed()        Read the speed of the encoder in counts per second
+    reset_encoders()            Resets both encoders
+    set_encoder()               Sets the encoder value of a specified motor
+
+    //Advanced Commands
     set_serial_timeout()        Sets the serial timeout
     read_serial_timeout()       Reads the serial timeout
 
