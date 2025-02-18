@@ -20,11 +20,10 @@ jobs:
         id: version_check
         run: |
           if git diff HEAD^ HEAD -- Cargo.toml | grep -E '^\+version\s*=\s*".+"$'; then
-            echo "changed=true" >> $GITHUB_ENV
+            echo "changed=true" >> $GITHUB_OUTPUT
           else
-            echo "changed=false" >> $GITHUB_ENV
+            echo "changed=false" >> $GITHUB_OUTPUT
           fi
-          echo "changed=${{ env.changed }}" >> $GITHUB_OUTPUT
   
   build:
     needs: check_version
