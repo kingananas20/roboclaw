@@ -1,3 +1,6 @@
+#[allow(unused_imports)]
+#[allow(dead_code)]
+
 mod roboclaw;
 use pyo3::prelude::*;
 use roboclaw::{RoboClaw, Motor};
