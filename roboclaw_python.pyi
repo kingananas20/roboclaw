@@ -6,7 +6,7 @@ class Motor:
 
 class RoboClaw:  
     """
-    Class to control the roboclaw
+    Class to control one or multiple RoboClaws
     """
 
     def set_speed(self, motor: Motor, speed: int, address: int = None) -> bool: 
