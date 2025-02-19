@@ -113,7 +113,7 @@ jobs:
       - name: Combine wheels into one directory
         run: |
           mkdir -p combined_wheels
-          find dist -name '*.whl' -exec cp {} combined_wheels\;
+          find dist -name '*.whl' -exec mv {} combined_wheels/ \;
 
       - name: Install twine
         run: |
