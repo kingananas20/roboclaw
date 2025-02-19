@@ -59,7 +59,7 @@ jobs:
       - name: Upload wheel as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.arch }}
           path: ./target/wheels/*.whl
           retention-days: 1
 
@@ -90,9 +90,9 @@ jobs:
           maturin build --release
 
       - name: Upload wheel to artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-windows
           path: ./target/wheels/*.whl
           retention-days: 1
 
@@ -110,10 +110,15 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Combine wheels into one directory
+        run: |
+          mkdir -p combined_wheels
+          find dist -name '*.whl' -exec cp {} combined_wheels\;
+
       - name: Install twine
         run: |
           pip install twine
 
       - name: Upload to PyPi
         run: |
-          python3 -m twine upload dist/* -p ${{ secrets.PYPI_TOKEN }}
+          python3 -m twine upload combined_wheels/* -p ${{ secrets.PYPI_TOKEN }}
