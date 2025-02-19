@@ -54,7 +54,7 @@ jobs:
 
       - name: Build
         run: |
-          maturin build --release --manylinux=2_17
+          maturin build --release --manylinux=2_28
 
       - name: Upload wheel as artifact
         uses: actions/upload-artifact@v4
