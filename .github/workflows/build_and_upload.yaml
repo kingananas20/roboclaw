@@ -61,11 +61,13 @@ jobs:
         if: matrix.arch == 'ubuntu-24.04'
         run: |
           maturin build --target x86_64-unknown-linux-musl --release
+          maturin build --release
       
       - name: Build for arch64
         if: matrix.arch == 'ubuntu-24.04-arm'
         run: |
           maturin build --target aarch64-unknown-linux-musl --release
+          maturin build --release
 
       - name: Upload wheel as artifact
         uses: actions/upload-artifact@v4
