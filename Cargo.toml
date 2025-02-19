@@ -1,6 +1,6 @@
 [package]
 name = "roboclaw_python"
-version = "0.5.19"
+version = "0.6.0"
 edition = "2021"
 
 [lib]

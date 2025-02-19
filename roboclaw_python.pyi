@@ -53,6 +53,11 @@ class RoboClaw:
         """
         Set the value of the specified encoder register. Useful when homing. This command applies to quadrature encoders only.
         """
+    def read_raw_speed(self, motor: Motor, address: int = None) -> int:
+        """
+        Read the pulses counted in the last 300th of a second. This is an unfiltered version of funciton read_encoder_speeds.
+        This function can be used to make an independant PID routine. Value returned is in encoder counts per second.
+        """
 
     #Advanced Commands
     def set_serial_timeout(self, timeout: int, address: int = None) -> bool:

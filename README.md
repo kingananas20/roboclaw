@@ -38,6 +38,7 @@ Here's a list of example devices:
     read_encoder_speed()        Read the speed of the encoder in counts per second
     reset_encoders()            Resets both encoders
     set_encoder()               Sets the encoder value of a specified motor
+    read_raw_speed()            Reads the raw speed of the encoders
 
     //Advanced Commands
     set_serial_timeout()        Sets the serial timeout
