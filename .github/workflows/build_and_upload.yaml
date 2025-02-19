@@ -7,7 +7,7 @@ on:
 
 jobs:
   check_version:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     outputs:
       version_changed: ${{ steps.version_check.outputs.changed }}
     steps:
@@ -129,6 +129,10 @@ jobs:
       - name: Install twine
         run: |
           pip install twine
+
+      - name: Check wheels
+        run: |
+          python3 -m twine check combined_wheels/*
 
       - name: Upload to PyPi
         run: |
