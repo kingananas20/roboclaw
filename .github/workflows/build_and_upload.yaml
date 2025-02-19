@@ -49,12 +49,23 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libudev-dev
+          sudo apt-get install -y libudev-dev musl-tools gcc-aarch64-linux-gnu
           pip3 install maturin twine
 
-      - name: Build
+      - name: Add musl targets
         run: |
-          maturin build --release --manylinux=2_28
+          rustup target add x86_64-unknown-linux-musl
+          rustup target add aarch64-unknown-linux-musl
+
+      - name: Build for x86_64
+        if: matrix.arch == 'ubuntu-24.04'
+        run: |
+          maturin build --target x86_64-unknown-linux-musl --release
+      
+      - name: Build for arch64
+        if: matrix.arch == 'ubuntu-24.04-arm'
+        run: |
+          maturin build --target aarch64-unknown-linux-musl --release
 
       - name: Upload wheel as artifact
         uses: actions/upload-artifact@v4
