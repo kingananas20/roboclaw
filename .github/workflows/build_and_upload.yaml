@@ -28,7 +28,10 @@ jobs:
   build:
     needs: check_version
     if: needs.check_version.outputs.version_changed == 'true'
-    runs-on: ubuntu-24.04-arm
+    strategy:
+      matrix:
+        arch: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.arch }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
