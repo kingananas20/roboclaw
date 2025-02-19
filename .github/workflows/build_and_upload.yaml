@@ -25,7 +25,7 @@ jobs:
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
   
-  build:
+  build-linux:
     needs: check_version
     if: needs.check_version.outputs.version_changed == 'true'
     strategy:
@@ -49,7 +49,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip libudev-dev
+          sudo apt-get install -y libudev-dev
           pip3 install maturin twine
 
       - name: Build
@@ -60,3 +60,32 @@ jobs:
         run: |
           python3 -m twine upload "./target/wheels/*" -p ${{ secrets.PYPI_TOKEN }}
 
+  build-windows:
+    needs: check_version
+    if: needs.check_version.outputs.version_changed == 'true'
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      
+      - name: Install dependencies
+        run: |
+          pip install maturin twine
+
+      - name: Build
+        run: |
+          maturin build --release
+
+      - name: Upload to PyPi
+        run: |
+          python -m twine upload "./target/wheels/*" -p ${{ secrets.PYPI_TOKEN }}
