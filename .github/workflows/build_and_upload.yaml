@@ -117,16 +117,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: dist
+          merge-multiple: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-
-      - name: Combine wheels into one directory
-        run: |
-          mkdir -p combined_wheels
-          find dist -name '*.whl' -exec mv {} combined_wheels/ \;
 
       - name: Install twine
         run: |
@@ -134,8 +130,8 @@ jobs:
 
       - name: Check wheels
         run: |
-          python3 -m twine check combined_wheels/*
+          python3 -m twine check dist/*
 
       - name: Upload to PyPi
         run: |
-          python3 -m twine upload combined_wheels/* -p ${{ secrets.PYPI_TOKEN }}
+          python3 -m twine upload dist/* -p ${{ secrets.PYPI_TOKEN }}
