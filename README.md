@@ -9,7 +9,7 @@ Features
 
 ## System Requirements
 This library works on windows x86, linux x86 and linux aarch64 machines.
-Linux supports glibc or musl.
+Linux supports glibc 2.34+ or musl 1.2+.
 Python version needs to be 3.7 or higher.
 
 ## Installation
