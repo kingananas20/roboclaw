@@ -71,6 +71,33 @@ class RoboClaw:
         Read calculated position error in encoder counts per second.
         """
 
+    #Advanced Motor Control
+    def set_velocity_pid(self, motor: Motor, qpps: int, p: int, i: int, d: int, address: int = None) -> bool:
+        """
+        Several motor and quadrature combinations can be used with RoboClaw. In some cases the default PID values will need to be tuned
+        for the systems being driven. This gives greater flexibility in what motor and encoder combinations can be used. The RoboClaw PID
+        system consists of four constants starting with QPPS, P = Proportional, I = Integral, D = Derivative. 
+        The default values are
+        - QPPS: 44000
+        - P: 0x00010000
+        - I: 0x00008000
+        - D: 0x00004000
+
+        QPPS is the speed of the encoder when the motor is at 100% power. P, I, D are the default values used after reset.
+        """
+    def set_speed_duty(self, motor: Motor, duty: int, address: int = None) -> bool:
+        """
+        Drive the specified motor using a duty cycle value. The duty cycle is used to control the speed of the motor 
+        without a quadrature encoder.
+        The duty value is signed and the range -32767 to 32767.
+        """
+    def drive_duty(self, duty: int, address: int = None) -> bool:
+        """
+        Drive the both motors using a duty cycle value. The duty cycle is used to control the speed of the motor 
+        without a quadrature encoder.
+        The duty value is signed and the range -32767 to 32767.
+        """
+
     #Advanced Commands
     def set_serial_timeout(self, timeout: int, address: int = None) -> bool:
         """

@@ -41,6 +41,11 @@ Python version needs to be 3.7 or higher.
     read_speed_error()          Reads speed error
     read_position_error()       Read position error
 
+    //Advanced motor controls
+    set_velocity_pid()          28 / 29
+    set_speed_duty()            32 / 33
+    drive_duty()                34
+
     //Advanced Commands
     set_serial_timeout()        Sets the serial timeout
     read_serial_timeout()       Reads the serial timeout

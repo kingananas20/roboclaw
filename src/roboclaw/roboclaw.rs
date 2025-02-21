@@ -185,6 +185,37 @@ impl RoboClaw {
         })
     }
 
+    //-----------------------------[Advanced Motor Controls]--------------------------------//
+
+    #[pyo3(signature = (motor, qpps, proportional, integral, derivative, address=None))]
+    fn set_velocity_pid(&mut self, motor: Motor, qpps: i32, proportional: i32, integral: i32, derivative: i32, address: Option<u8>) -> Result<bool> {
+        let command: Commands = match motor {
+            Motor::M1 => Commands::M1SetVelocityPIDConst,
+            Motor::M2 => Commands::M2SetVelocityPIDConst,
+        };
+        let address: u8 = address.unwrap_or(self.address);
+        self.connection.write(address, command, &[derivative as u32, proportional as u32, integral as u32, qpps as u32])?;
+        Ok(true)
+    }
+
+    #[pyo3(signature = (motor, duty, address=None))]
+    fn set_speed_duty(&mut self, motor: Motor, duty: i16, address: Option<u8>) -> Result<bool> {
+        let command: Commands = match motor {
+            Motor::M1 => Commands::M1DriveSignedDutyCycle,
+            Motor::M2 => Commands::M2DriveSignedDutyCycle,
+        };
+        let address: u8 = address.unwrap_or(self.address);
+        self.connection.write(address, command, &[duty as i32 as u32])?;
+        Ok(true)
+    }
+
+    #[pyo3(signature = (duty, address=None))]
+    fn drive_duty(&mut self, duty: i16, address: Option<u8>) -> Result<bool> {
+        let address: u8 = address.unwrap_or(self.address);
+        self.connection.write(address, Commands::MixDriveSignedDutyCycle, &[duty as i32 as u32])?;
+        Ok(true)
+    }
+
     //--------------------------------[Advanced Commands]--------------------------------//
 
     #[pyo3(signature = (timeout, address=None))]
