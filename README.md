@@ -54,6 +54,7 @@ You can see a more detailed description in the [Roboclaw User Manual](https://do
     read_serial_timeout()       15
 
 ## External links
+-   [GitHub Repository](https://github.com/kingananas20/roboclaw)
 -   [Basic Micro](https://www.basicmicro.com/)
 -   [Roboclaw User Manual](https://downloads.basicmicro.com/docs/roboclaw_user_manual.pdf)
 
