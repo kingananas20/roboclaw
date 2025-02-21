@@ -38,6 +38,8 @@ Python version needs to be 3.7 or higher.
     set_encoder()               Sets the encoder value of a specified motor
     read_raw_speed()            Reads the raw speed of the encoders
     read_avg_speed()            Reads the average speed of the encoders
+    read_speed_error()          Reads speed error
+    read_position_error()       Read position error
 
     //Advanced Commands
     set_serial_timeout()        Sets the serial timeout

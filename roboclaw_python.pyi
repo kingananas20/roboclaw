@@ -62,6 +62,14 @@ class RoboClaw:
         """
         Read M1 or M2 average speed. Returns the speed in encoder counts per second.
         """
+    def read_speed_error(self, motor: Motor, address: int = None) -> int:
+        """
+        Read calculated speed error in encoder counts per second.
+        """
+    def read_position_error(self, motor: Motor, address: int = None) -> int:
+        """
+        Read calculated position error in encoder counts per second.
+        """
 
     #Advanced Commands
     def set_serial_timeout(self, timeout: int, address: int = None) -> bool:
