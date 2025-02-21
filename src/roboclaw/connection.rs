@@ -125,7 +125,7 @@ impl Connection {
 
     fn read_checksum(&mut self) -> Result<bool> {
         let crc: Vec<u8> = self.read_bytes(2)?;
-        if self.crc.get() & 0xFFFF == u16::from_be_bytes([crc[0], crc[1]]) {
+        if self.crc.get() == u16::from_be_bytes([crc[0], crc[1]]) {
             return Ok(true);
         }
         Err(anyhow!("crc mismatch during reading"))

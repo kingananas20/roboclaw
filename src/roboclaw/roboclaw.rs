@@ -90,12 +90,12 @@ impl RoboClaw {
             Motor::M1 => {
                 let encoder_value: i64 = calculate_encoder(self.encoder_value_m1, read_result);
                 self.encoder_value_m1 = encoder_value;
-                return Ok(encoder_value);
+                Ok(encoder_value)
             },
             Motor::M2 => {
                 let encoder_value: i64 = calculate_encoder(self.encoder_value_m2, read_result);
                 self.encoder_value_m2 = encoder_value;
-                return Ok(encoder_value);
+                Ok(encoder_value)
             },
         }
     }
