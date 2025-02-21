@@ -1,4 +1,4 @@
-# RoboClaw Encoder Interface
+# RoboClaw Driver
 This project provides an interface for controlling and reading encoder values from RoboClaw motor controllers. It allows you to set motor speeds, control motor movement, and read encoder values with proper handling of overflow, underflow, and direction.
 Features
 
