@@ -152,6 +152,17 @@ impl RoboClaw {
         Ok(speed)
     }
 
+    #[pyo3(signature = (motor, address=None))]
+    fn read_avg_speed(&mut self, motor: Motor, address: Option<u8>) -> Result<i64> {
+        let address: u8 = address.unwrap_or(self.address);
+        let read_result: Vec<u32> = self.connection.read(address, Commands::ReadMotorAvgSpeed, vec![4, 4])?;
+
+        Ok(match motor {
+            Motor::M1 => read_result[0] as i32 as i64,
+            Motor::M2 => read_result[1] as i32 as i64,
+        })
+    }
+
     //--------------------------------[Advanced Commands]--------------------------------//
 
     #[pyo3(signature = (timeout, address=None))]

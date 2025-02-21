@@ -8,11 +8,9 @@ Features
     Read Encoder: Accurately read encoder values, adjusting for overflow and underflow.
 
 ## System Requirements
-This library will only work on devices with the AArch64 architecture running linux/gnu.
-Here's a list of example devices:
--   Raspberry PI 3/4/5 (Requires a 64-bit OS)
--   Raspberry PI Zero 2 W
--   NVIDIA Jetson Series
+This library works on windows x86, linux x86 and linux aarch64 machines.
+Linux supports glibc or musl.
+Python version needs to be 3.7 or higher.
 
 ## Installation
     pip install roboclaw-python
@@ -39,6 +37,7 @@ Here's a list of example devices:
     reset_encoders()            Resets both encoders
     set_encoder()               Sets the encoder value of a specified motor
     read_raw_speed()            Reads the raw speed of the encoders
+    read_avg_speed()            Reads the average speed of the encoders
 
     //Advanced Commands
     set_serial_timeout()        Sets the serial timeout
