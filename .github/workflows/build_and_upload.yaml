@@ -1,4 +1,4 @@
-name: Build for aarch64 and upload to pypi
+name: Build and upload
 
 on:
   push:
