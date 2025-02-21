@@ -27,19 +27,22 @@ Python version needs to be 3.7 or higher.
     print(f"Motor M1 Encoder: {encoder_value_m1}")
 
 ## Currently supported
-    set_speed()                 M1 + M2 Forward and Backwards
-    drive()                     Both motors forwards and backwards at the same time
-    turn()                      Turn one or the other motor
+These are the currently supported functions. The number shows which RoboClaw commands it uses.
+You can see a more detailed description in the [Roboclaw User Manual](https://downloads.basicmicro.com/docs/roboclaw_user_manual.pdf)
+
+    set_speed()                 0 / 1 / 4 / 5
+    drive()                     8 / 9
+    turn()                      10 / 11
 
     //Encoders
-    read_encoder()              Reads the encoder of a specified motor
-    read_encoder_speed()        Read the speed of the encoder in counts per second
-    reset_encoders()            Resets both encoders
-    set_encoder()               Sets the encoder value of a specified motor
-    read_raw_speed()            Reads the raw speed of the encoders
-    read_avg_speed()            Reads the average speed of the encoders
-    read_speed_error()          Reads speed error
-    read_position_error()       Read position error
+    read_encoder()              16 / 17
+    read_encoder_speed()        18 / 19
+    reset_encoders()            20
+    set_encoder()               22 / 23
+    read_raw_speed()            30 / 31
+    read_avg_speed()            108
+    read_speed_error()          111
+    read_position_error()       114
 
     //Advanced motor controls
     set_velocity_pid()          28 / 29
@@ -47,8 +50,8 @@ Python version needs to be 3.7 or higher.
     drive_duty()                34
 
     //Advanced Commands
-    set_serial_timeout()        Sets the serial timeout
-    read_serial_timeout()       Reads the serial timeout
+    set_serial_timeout()        14
+    read_serial_timeout()       15
 
 ## External links
 -   [Basic Micro](https://www.basicmicro.com/)
