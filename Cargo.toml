@@ -1,6 +1,6 @@
 [package]
 name = "roboclaw_python"
-version = "0.10.0"
+version = "0.10.1"
 edition = "2024"
 
 [lib]
@@ -13,8 +13,4 @@ pyo3 = { version = "0.23.4", features = ["anyhow", "multiple-pymethods", "extens
 anyhow = "1.0.95"
 
 [profile.release]
-lto = "fat"
-panic = "unwind"
-codegen-units = 1
-debug = true
 opt-level = 3
