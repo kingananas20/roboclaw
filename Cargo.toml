@@ -1,6 +1,6 @@
 [package]
 name = "roboclaw_python"
-version = "0.10.1"
+version = "0.10.2"
 edition = "2024"
 
 [lib]
@@ -11,6 +11,3 @@ crate-type = ["cdylib"]
 serialport = "4.7.0"
 pyo3 = { version = "0.23.4", features = ["anyhow", "multiple-pymethods", "extension-module", "abi3-py37"] }
 anyhow = "1.0.95"
-
-[profile.release]
-opt-level = 3
