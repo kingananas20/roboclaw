@@ -1,6 +1,6 @@
 pub fn calculate_encoder(current_encoder_value: i64, motor_encoder: Vec<u32>) -> i64 {
     let bits: [u8; 8] = get_bits(motor_encoder[1] as u8);
-    
+
     let delta: i64 = motor_encoder[0] as i32 as i64;
     let mut sum: i64 = current_encoder_value + delta;
 
